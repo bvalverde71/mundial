@@ -49,20 +49,24 @@ const Apuesta = new mongoose.model("apuestas", betSchema);
 
 //El browser identifica esta funcion como punto de partida del app la ruta es la raiz del app "/" y como respuesta del server se manda el archivo "signup/html" que esta en la raiz
 app.get("/", function(req, res) {
-  const contenido = []
+  //const contenido = []
   Fase.find({ _id: "grupos"},{}, function(err, fase) {
     //bets = Fase.find({ _id: "grupos"},{"content.title": 1,"title": 1,"_id": 0});
     //console.log(fase);
-    contenido.push(fase);
+    //deconstructing fase para poner mas claridad a los datos que se pasaran a la pagina
+    const [{title}] = fase;
+    const [{content:groupTitle}]= fase;
+    //contenido.push(fase);
+    console.log(title);
     Apuesta.find({fase_id:"grupos"},{},function(err, bets){
-      console.log(bets.length);
-      contenido.push(bets);
-      //console.log(contenido);
+      //console.log(bets);
       // bets.forEach( function(j){
       //   console.log(j.person_id);
       // });
       res.render("grupos", {
-        data: contenido
+        titulo: title,
+        tituloFila: groupTitle,
+        data: bets
       });
     });
   });

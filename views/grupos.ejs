@@ -1,20 +1,20 @@
 <%- include("partials/header") -%>
 
-<h2><%= data[0][0].title %></h2>
+<h2><%= titulo.title %></h2>
 <div class="table-responsive-md">
   <table class="table table-sm table-striped">
     <caption>Participantes</caption>
     <thead class="stbl_head">
       <tr>
         <th scope="col"></th>
-        <% data[0][0].content.forEach( function (rowContent){%>
+        <% tituloFila.forEach( function (rowContent){%>
         <th scope="col"><%= rowContent.title %></th>
       <% }); %>
         <th class="result" scope="col">Puntos</th>
       </tr>
     </thead>
     <tbody>
-        <% data[1].forEach( function (i){%>
+        <% data.forEach( function (i){%>
         <tr>
           <th scope="row"><%= i.person_id %></th>
           <% i.bet.forEach( function (j){%>
