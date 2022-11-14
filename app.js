@@ -2,6 +2,7 @@ require('dotenv').config()  //This package is used to get acces to env variables
 const express = require('express');
 const mongoose = require("mongoose") // package para connectarse a mongoDB
 const bodyParser = require("body-parser");
+const dbOper = require("./dbOper.js");
 const _ = require("lodash"); //Este package se utiliza para manipular Strings (capitalize, convert, etc)
 
 const app = express(); //Se crea la instancia del app
@@ -17,11 +18,22 @@ app.use(express.static("public")); // Se usa para referencia de tus archivos loc
 
 //Version con conexion to MongoDB para almacenar la data
 //Version local MongoDB
-//mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
+mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
 //Version Atlas
 const dbUser=process.env.DB_USER;
 const dbPwd=process.env.DB_PWD;
-mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
+//mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
+
+const fechaActual = new Date();
+const fechaInicio = new Date("2022-11-20");
+const fechaFinal = new Date("2022-12-19");
+//Carga Inicial de fixture
+dbOper.initialLoad(setDateString(fechaActual));
+
+if (fechaActual >= fechaInicio && fechaActual < fechaFinal)   {
+  console.log("Mundial en progreso. Hoy es "+ setDateString(fechaActual));
+}
+else console.log("No es necesario actualizar datos ");
 
 //Mi definicion de esquema y tablas
 const faseSchema = new mongoose.Schema({
@@ -108,3 +120,10 @@ app.post("/failure", function(req, res) {
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server iniciado con exito!. Bienvenidos!")
 });
+
+function setDateString(fecha){
+  const year = fecha.getFullYear();
+  const mes = fecha.getMonth()+1;
+  const dia = fecha.getDate();
+  return year + "-" + mes + "-" + dia;
+}
