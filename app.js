@@ -18,11 +18,11 @@ app.use(express.static("public")); // Se usa para referencia de tus archivos loc
 
 //Version con conexion to MongoDB para almacenar la data
 //Version local MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
+//mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
 //Version Atlas
 const dbUser=process.env.DB_USER;
 const dbPwd=process.env.DB_PWD;
-//mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
+mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
 
 const fechaActual = new Date();
 const fechaInicio = new Date("2022-11-20");
