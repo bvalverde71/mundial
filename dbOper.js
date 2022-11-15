@@ -29,7 +29,7 @@ async function restCall2(isInitialLoad, fecha){
   }
 };
 
-exports.initialLoad = function(fecha){
+exports.initialLoad = function(fecha, Fase, Bet){
   const fechaChar = fecha.toString();
   const fixtureSchema =  new mongoose.Schema({
     _id: String,
@@ -120,15 +120,15 @@ exports.initialLoad = function(fecha){
                   if (homeGol > awayGol){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
-                    updEquipos(fechaUpdate,Equipo,homeTeam,3);
+                    updEquipos(fechaUpdate,Equipo,homeTeam,3,Fase,Bet);
                   } else if (awayGol > homeGol){
                     // away Team winner
-                    updEquipos(fechaUpdate,Equipo,awayTeam,3);
+                    updEquipos(fechaUpdate,Equipo,awayTeam,3,Fase,Bet);
                   } else if ((awayGol === homeGol) && !(awayGol === null || homeGol === null)){
                   //} else if (awayGol === homeGol) {
                     // empate
-                     updEquipos(fechaUpdate,Equipo,awayTeam,1);
-                     updEquipos(fechaUpdate,Equipo,homeTeam,1);
+                     updEquipos(fechaUpdate,Equipo,awayTeam,1,Fase,Bet);
+                     updEquipos(fechaUpdate,Equipo,homeTeam,1,Fase,Bet);
                   } else
                     console.log("Equipos no actualizados");
                 });
@@ -141,16 +141,28 @@ exports.initialLoad = function(fecha){
   });
 };
 
-function updEquipos(fecha, Team, equipo, goles){
+function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
   Team.findOne({nameEng:equipo},(err,doc) => {
   if (err) console.log(err);
   else {
-  const puntosUpd = doc.puntos + goles;
-  console.log("Updating "+ doc.name);
-  Team.updateOne({_id:doc._id},{$set:{puntos:puntosUpd,lastUpdate:fecha}}, (err) => {
-    if (err) console.log(err);
-    else  console.log("Equipo actualizado:", doc.name);
-  });
+    const puntosUpd = doc.puntos + goles;
+    console.log("Updating "+ doc.name);
+    Team.updateOne({_id:doc._id},{$set:{puntos:puntosUpd,lastUpdate:fecha}}, (err) => {
+      if (err) console.log(err);
+      else  console.log("Equipo actualizado:", doc.name);
+    });
+    Bet.find({fase_id:"grupos","bet.betSelect":doc.name}, (err,recs) =>{
+      if (err) console.log(err);
+      else {
+        recs.forEach(elemento =>{
+          const puntosBet = elemento.puntos + goles;
+           Bet.updateOne({_id:elemento._id},{$set:{puntos:puntosBet}}, (err) => {
+            if (err) console.log(err);
+            else  console.log("Apuesta actualizada:", elemento.person_id);
+          });
+        });
+      }
+    });
 }
 });
 }

@@ -27,8 +27,6 @@ mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.n
 const fechaActual = new Date();
 const fechaInicio = new Date("2022-11-20");
 const fechaFinal = new Date("2022-12-19");
-//Carga Inicial de fixture
-dbOper.initialLoad(setDateString(fechaActual));
 
 if (fechaActual >= fechaInicio && fechaActual < fechaFinal)   {
   console.log("Mundial en progreso. Hoy es "+ setDateString(fechaActual));
@@ -59,6 +57,9 @@ const betSchema = new mongoose.Schema({
 const Fase = new mongoose.model("fases", faseSchema);
 const Apuesta = new mongoose.model("apuestas", betSchema);
 
+//Carga Inicial de fixture
+dbOper.initialLoad(setDateString(fechaActual),Fase,Apuesta);
+
 //El browser identifica esta funcion como punto de partida del app la ruta es la raiz del app "/" y como respuesta del server se manda el archivo "signup/html" que esta en la raiz
 app.get("/", function(req, res) {
   //const contenido = []
@@ -71,6 +72,7 @@ app.get("/", function(req, res) {
     //contenido.push(fase);
     console.log(title);
     Apuesta.find({fase_id:"grupos"},{},function(err, bets){
+      //const bets=[];
       //console.log(bets);
       // bets.forEach( function(j){
       //   console.log(j.person_id);
