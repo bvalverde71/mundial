@@ -54,15 +54,30 @@ const betSchema = new mongoose.Schema({
   }]
 });
 
+const fixtureSchema =  new mongoose.Schema({
+  _id: String,
+  date: String,
+  status:String,
+  grupo:String,
+  team1:String,
+  team2:String,
+  team1Gol:String,
+  team2Gol:String
+});
+
 const Fase = new mongoose.model("fases", faseSchema);
 const Apuesta = new mongoose.model("apuestas", betSchema);
-
+const Game = mongoose.model("games",fixtureSchema);
 //Carga Inicial de fixture
-dbOper.initialLoad(setDateString(fechaActual),Fase,Apuesta);
+let count=0;
+dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game);
 
 //El browser identifica esta funcion como punto de partida del app la ruta es la raiz del app "/" y como respuesta del server se manda el archivo "signup/html" que esta en la raiz
 app.get("/", function(req, res) {
-  //const contenido = []
+  if (count > 0) dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game);
+  console.log(count);
+  count+=1;
+    //console.log(c);
   Fase.find({ _id: "grupos"},{}, function(err, fase) {
     //bets = Fase.find({ _id: "grupos"},{"content.title": 1,"title": 1,"_id": 0});
     //console.log(fase);
@@ -71,9 +86,10 @@ app.get("/", function(req, res) {
     const [{content:groupTitle}]= fase;
     //contenido.push(fase);
     console.log(title);
-    Apuesta.find({fase_id:"grupos"},{},function(err, bets){
-      //const bets=[];
+    //Apuesta.find({fase_id:"grupos"}).sort({puntos:-1}).exec(function(err, bets){
+    Apuesta.find({fase_id:"grupos"},null,{sort:{puntos:-1}},function(err, bets){
       //console.log(bets);
+      //const bets=[];
       // bets.forEach( function(j){
       //   console.log(j.person_id);
       // });

@@ -29,24 +29,15 @@ async function restCall2(isInitialLoad, fecha){
   }
 };
 
-exports.initialLoad = function(fecha, Fase, Bet){
+exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game){
+
   const fechaChar = fecha.toString();
-  const fixtureSchema =  new mongoose.Schema({
-    _id: String,
-    date: String,
-    status:String,
-    grupo:String,
-    team1:String,
-    team2:String,
-    team1Gol:String,
-    team2Gol:String
-  });
-  const Game = mongoose.model("games",fixtureSchema);
-  // Verificamos si existen registros
+  
+// Verificamos si existen registros
   Game.find(function(err, result) {
     if (err) console.log(err)
     else {
-      if (result.length === 0)  {
+      if (result.length === 0 && firstCall === 0)  {
         console.log("Collection vacia. insertado datos from API ...");
         //const cargaInicial = restCall("initialLoad", null);
         const promise = restCall2(true,null);
