@@ -18,11 +18,11 @@ app.use(express.static("public")); // Se usa para referencia de tus archivos loc
 
 //Version con conexion to MongoDB para almacenar la data
 //Version local MongoDB
-//mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
+mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
 //Version Atlas
 const dbUser=process.env.DB_USER;
 const dbPwd=process.env.DB_PWD;
-mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
+//mongoose.connect("mongodb+srv://"+dbUser+":"+dbPwd+"@micluster.ulmi81e.mongodb.net/Mundial?retryWrites=true&w=majority");
 
 const fechaActual = new Date();
 const fechaInicio = new Date("2022-11-20");
@@ -65,16 +65,26 @@ const fixtureSchema =  new mongoose.Schema({
   team2Gol:String
 });
 
+const equipoSchema =  new mongoose.Schema({
+  _id: Number,
+  name: String,
+  nameEng:String,
+  grupo:String,
+  puntos:{type: Number},
+  lastUpdate:Date
+  });
+
+const Equipo = mongoose.model("equipos",equipoSchema);
 const Fase = new mongoose.model("fases", faseSchema);
 const Apuesta = new mongoose.model("apuestas", betSchema);
 const Game = mongoose.model("games",fixtureSchema);
 //Carga Inicial de fixture
 let count=0;
-dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game);
+dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game,Equipo);
 
 //El browser identifica esta funcion como punto de partida del app la ruta es la raiz del app "/" y como respuesta del server se manda el archivo "signup/html" que esta en la raiz
 app.get("/", function(req, res) {
-  if (count > 0) dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game);
+  if (count > 0) dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game,Equipo);
   console.log(count);
   count+=1;
     //console.log(c);

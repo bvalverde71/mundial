@@ -29,10 +29,10 @@ async function restCall2(isInitialLoad, fecha){
   }
 };
 
-exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game){
+exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
 
   const fechaChar = fecha.toString();
-  
+
 // Verificamos si existen registros
   Game.find(function(err, result) {
     if (err) console.log(err)
@@ -84,15 +84,15 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game){
           if (i.length > 0) {
               console.log("Juegos no actualizados, llamando al API por fecha");
               const fechaUpdate = new Date();
-              const equipoSchema =  new mongoose.Schema({
-                _id: Number,
-                name: String,
-                nameEng:String,
-                grupo:String,
-                puntos:{type: Number},
-                lastUpdate:Date
-                });
-              const Equipo = mongoose.model("equipos",equipoSchema);
+              // const equipoSchema =  new mongoose.Schema({
+              //   _id: Number,
+              //   name: String,
+              //   nameEng:String,
+              //   grupo:String,
+              //   puntos:{type: Number},
+              //   lastUpdate:Date
+              //   });
+              // const Equipo = mongoose.model("equipos",equipoSchema);
               //Calling API para recuperar data
               const promise = restCall2(false,fechaChar);
               promise.then((datos) =>{
