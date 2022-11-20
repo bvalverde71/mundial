@@ -108,6 +108,7 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
                     if (err) console.log(err);
                     else console.log("Fixture "+id+" actualizado...");
                   });
+                  if (gameStatus === "FT"){
                   if (homeGol > awayGol){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
@@ -122,6 +123,7 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
                      updEquipos(fechaUpdate,Equipo,homeTeam,1,Fase,Bet);
                   } else
                     console.log("Equipos no actualizados");
+                  }  
                 });
               });
           }
