@@ -84,16 +84,6 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
           if (i.length > 0) {
               console.log("Juegos no actualizados, llamando al API por fecha");
               const fechaUpdate = new Date();
-              // const equipoSchema =  new mongoose.Schema({
-              //   _id: Number,
-              //   name: String,
-              //   nameEng:String,
-              //   grupo:String,
-              //   puntos:{type: Number},
-              //   lastUpdate:Date
-              //   });
-              // const Equipo = mongoose.model("equipos",equipoSchema);
-              //Calling API para recuperar data
               const promise = restCall2(false,fechaChar);
               promise.then((datos) =>{
                 datos.forEach(function(element){
@@ -106,12 +96,17 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
                   console.log(id, gameStatus, homeGol,awayGol);
                   Game.findByIdAndUpdate(id,{$set:{status: gameStatus, team1Gol: homeGol, team2Gol:awayGol}}, function (err, doc){
                     if (err) console.log(err);
-                    else console.log("Fixture "+id+" actualizado...");
-                  });
-                  if (gameStatus === "FT"){
+                    else {
+                      console.log("status:",doc.status);
+                      let actualizar = false;
+                      if (doc.status != "FT" && gameStatus === "FT") actualizar = true
+                      console.log("Fixture "+id+" actualizado...");
+
+                  if (gameStatus === "FT" && actualizar){
                   if (homeGol > awayGol){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
+                    console.log("Home Equipo ganador",homeTeam);
                     updEquipos(fechaUpdate,Equipo,homeTeam,3,Fase,Bet);
                   } else if (awayGol > homeGol){
                     // away Team winner
@@ -123,7 +118,9 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
                      updEquipos(fechaUpdate,Equipo,homeTeam,1,Fase,Bet);
                   } else
                     console.log("Equipos no actualizados");
-                  }  
+                  }
+                }
+                  });
                 });
               });
           }
@@ -135,11 +132,14 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
 };
 
 function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
+  console.log("Updating Equipo:",equipo);
   Team.findOne({nameEng:equipo},(err,doc) => {
   if (err) console.log(err);
   else {
     const puntosUpd = doc.puntos + goles;
-    console.log("Updating "+ doc.name);
+    //Puntos extra si aciertan el resultado
+    //if (golHome === doc.betSelect[2] && (golAway === doc.betSelect[3])
+    //   puntosUpd = puntosUpd + 3;
     Team.updateOne({_id:doc._id},{$set:{puntos:puntosUpd,lastUpdate:fecha}}, (err) => {
       if (err) console.log(err);
       else  console.log("Equipo actualizado:", doc.name);
@@ -148,7 +148,10 @@ function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
       if (err) console.log(err);
       else {
         recs.forEach(elemento =>{
-          const puntosBet = elemento.puntos + goles;
+          let puntosBet = elemento.puntos + goles;
+          //Puntos extra si aciertan el resultado
+          //if (golHome === elemento.betSelect[2] && (golAway === element.betSelect[3])
+          //   puntosBet = puntosBet + 3;
            Bet.updateOne({_id:elemento._id},{$set:{puntos:puntosBet}}, (err) => {
             if (err) console.log(err);
             else  console.log("Apuesta actualizada:", elemento.person_id);

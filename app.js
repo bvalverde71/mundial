@@ -17,7 +17,7 @@ app.set("view engine", "ejs"); // Se utiliza para inicializar el  uso templates 
 app.use(express.static("public")); // Se usa para referencia de tus archivos locales usando un directorio base ej "public"
 
 //Version con conexion to MongoDB para almacenar la data
-//Version local MongoDB
+////Version local MongoDB
 //mongoose.connect("mongodb://127.0.0.1:27017/Mundial");
 //Version Atlas
 const dbUser=process.env.DB_USER;
