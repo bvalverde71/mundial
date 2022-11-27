@@ -17,8 +17,9 @@ async function restCall2(isInitialLoad, fecha){
           }
         };
   const restResp = await fetch(url, options)
+    //console.log(restResp.ok,);
     if (!restResp.ok) {
-      throw new Error (`HTTP error: ${response.status}`)
+      throw new Error (`HTTP error: ${restResp.status}; ${restResp.statusText}`)
     }
     const data = await restResp.json();
     console.log("Dentro la funcion:",data.parameters);
@@ -26,12 +27,15 @@ async function restCall2(isInitialLoad, fecha){
   }
   catch (error) {
     console.error(`Could not get data: ${error}`);
+    console.log("No se pudo recuperar datos. Revisar API");
+    return [];
   }
 };
 
-exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
+exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,fase){
 
   const fechaChar = fecha.toString();
+  const fechaTest = new Date();
 
 // Verificamos si existen registros
   Game.find(function(err, result) {
@@ -107,15 +111,15 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
                     console.log("Home Equipo ganador",homeTeam);
-                    updEquipos(fechaUpdate,Equipo,homeTeam,3,Fase,Bet);
+                    updEquipos(fechaUpdate,Equipo,homeTeam,3,Fase,Bet,Sistema,fase);
                   } else if (awayGol > homeGol){
                     // away Team winner
-                    updEquipos(fechaUpdate,Equipo,awayTeam,3,Fase,Bet);
+                    updEquipos(fechaUpdate,Equipo,awayTeam,3,Fase,Bet,Sistema,fase);
                   } else if ((awayGol === homeGol) && !(awayGol === null || homeGol === null)){
                   //} else if (awayGol === homeGol) {
                     // empate
-                     updEquipos(fechaUpdate,Equipo,awayTeam,1,Fase,Bet);
-                     updEquipos(fechaUpdate,Equipo,homeTeam,1,Fase,Bet);
+                     updEquipos(fechaUpdate,Equipo,awayTeam,1,Fase,Bet,Sistema,fase);
+                     updEquipos(fechaUpdate,Equipo,homeTeam,1,Fase,Bet,Sistema,fase);
                   } else
                     console.log("Equipos no actualizados");
                   }
@@ -131,8 +135,9 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo){
   });
 };
 
-function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
+function updEquipos(fecha, Team, equipo, goles, Fase,Bet,Sistema,fase){
   console.log("Updating Equipo:",equipo);
+  const fechaUpdStr = new Intl.DateTimeFormat("en-GB",{dateStyle: "short", timeStyle:"full", timeZone: 'America/La_Paz',}).format(fecha);
   Team.findOne({nameEng:equipo},(err,doc) => {
   if (err) console.log(err);
   else {
@@ -144,7 +149,7 @@ function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
       if (err) console.log(err);
       else  console.log("Equipo actualizado:", doc.name);
     });
-    Bet.find({fase_id:"grupos","bet.betSelect":doc.name}, (err,recs) =>{
+    Bet.find({fase_id:fase,"bet.betSelect":doc.name}, (err,recs) =>{
       if (err) console.log(err);
       else {
         recs.forEach(elemento =>{
@@ -160,5 +165,9 @@ function updEquipos(fecha, Team, equipo, goles, Fase, Bet){
       }
     });
 }
+});
+Sistema.findByIdAndUpdate(1,{$set:{lastUpdate: fechaUpdStr}}, (err,doc) =>{
+  if (err) console.log(err);
+  else console.log(`DB Actualizada: ${fechaUpdStr}`)
 });
 }
