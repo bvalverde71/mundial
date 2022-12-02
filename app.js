@@ -183,6 +183,7 @@ app.listen(process.env.PORT || 3000, function() {
 function setDateString(fecha){
   const year = fecha.getFullYear();
   const mes = fecha.getMonth()+1;
-  const dia = fecha.getDate();
+  let dia = fecha.getDate();
+  if (dia.length = 1) dia = "0"+dia;
   return year + "-" + mes + "-" + dia;
 }
