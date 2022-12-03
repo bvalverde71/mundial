@@ -134,8 +134,11 @@ app.get("/:groupName", function(req, res) {
   if (groupName == "about") {
     res.render("about");
   } else {
+    if (count > 0) dbOper.initialLoad(count,setDateString(fechaActual),Fase,Apuesta,Game,Equipo,Sistema,groupName);
+    console.log(count);
+    count+=1;
     Sistema.findById(1,function(err,sisValues){
-    Fase.find({_id:groupName},{},function(err,fase){
+      Fase.find({_id:groupName},{},function(err,fase){
       const [{title}] = fase;
       const [{content:groupTitle}]= fase;
       //contenido.push(fase);
@@ -181,9 +184,11 @@ app.listen(process.env.PORT || 3000, function() {
 });
 
 function setDateString(fecha){
-  const year = fecha.getFullYear();
-  const mes = fecha.getMonth()+1;
-  let dia = fecha.getDate();
-  if (dia.length = 1) dia = "0"+dia;
+  const year = fecha.toLocaleString("default",{year:"numeric"});
+  //const mes = fecha.getMonth()+1;
+  const mes = fecha.toLocaleString("default",{month:"2-digit"});
+  //let dia = fecha.getDate();
+  const dia = fecha.toLocaleString("default",{day:"2-digit"});
+  //if (dia.length = 1) dia = "0"+dia;
   return year + "-" + mes + "-" + dia;
 }
