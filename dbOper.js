@@ -68,7 +68,8 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
               if (!regex.test(round)){
                 console.log(id,shortDate, gameStatus, round, homeTeam,homeGol,awayTeam,awayGol);
                 if (round === "Round of 16") round = "octavos";
-                else if (round === "Round of 8") round = "cuartos";
+                else if (round === "Quarter-finals") round = "cuartos";
+                else if (round === "Semi-final") round = "semifinales";
                 Game.findById(id, function(err,docs){
                   if (docs === null) {
                    console.log("No records found",id);
