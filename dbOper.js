@@ -130,7 +130,7 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
                     else {
                       console.log("status:",doc.status);
                       let actualizar = false;
-                      if (doc.status != "FT" && (gameStatus === "FT" || gameStatus === "PEN" )) actualizar = true
+                      if ((doc.status != "FT" && doc.status!="PEN")   && (gameStatus === "FT" || gameStatus === "PEN" )) actualizar = true
                       console.log("Fixture "+id+" actualizado...");
 
                       if ((gameStatus === "FT" || gameStatus === "PEN")  && actualizar){
