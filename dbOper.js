@@ -113,20 +113,27 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
                   //const gameStatus = "FT";
                   const {teams:{home:{name: homeTeam}}} = element;
                   const {teams:{away:{name: awayTeam}}} = element;
-                  const {goals:{home:homeGol}} = element;
-                  const {goals:{away:awayGol}} = element;
+                  let {goals:{home:homeGol}} = element;
+                  let {goals:{away:awayGol}} = element;
+                  const {score:{penalty:{home:homeGolPen}}} = element;
+                  const {score:{penalty:{away:awayGolPen}}} = element;
+
                   //const homeGol = 2;
                   //const awayGol = 1;
-                  console.log(id, gameStatus, homeGol,awayGol);
+                  console.log(id, gameStatus, homeGol,awayGol,homeGolPen,awayGolPen);
+                  if (homeGolPen != null){
+                    homeGol = homeGolPen;
+                    awayGol = awayGolPen;
+                  }
                   Game.findByIdAndUpdate(id,{$set:{status: gameStatus, team1Gol: homeGol, team2Gol:awayGol}}, function (err, doc){
                     if (err) console.log(err);
                     else {
                       console.log("status:",doc.status);
                       let actualizar = false;
-                      if (doc.status != "FT" && gameStatus === "FT") actualizar = true
+                      if (doc.status != "FT" && (gameStatus === "FT" || gameStatus === "PEN" )) actualizar = true
                       console.log("Fixture "+id+" actualizado...");
 
-                      if (gameStatus === "FT" && actualizar){
+                      if ((gameStatus === "FT" || gameStatus === "PEN")  && actualizar){
                         if (homeGol > awayGol){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
