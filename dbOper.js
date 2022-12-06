@@ -109,31 +109,41 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
               promise.then((datos) =>{
                 datos.forEach(function(element){
                   const {fixture:{id}} = element;
-                  const {fixture:{status:{short: gameStatus}}} = element;
+                  let {fixture:{status:{short: gameStatus}}} = element;
                   //const gameStatus = "FT";
                   const {teams:{home:{name: homeTeam}}} = element;
                   const {teams:{away:{name: awayTeam}}} = element;
                   let {goals:{home:homeGol}} = element;
                   let {goals:{away:awayGol}} = element;
+                  const {score:{extratime:{home:homeGolExtra}}} = element;
+                  const {score:{extratime:{away:awayGolExtra}}} = element;
                   const {score:{penalty:{home:homeGolPen}}} = element;
                   const {score:{penalty:{away:awayGolPen}}} = element;
 
                   //const homeGol = 2;
                   //const awayGol = 1;
-                  console.log(id, gameStatus, homeGol,awayGol,homeGolPen,awayGolPen);
-                  if (homeGolPen != null){
+                  console.log(id, gameStatus, homeGol,awayGol,homeGolExtra, awayGolExtra, homeGolPen,awayGolPen);
+                  if (homeGolExtra != null && homeGolExtra != awayGolExtra) {
+                    homeGol = homeGolExtra;
+                    awayGol = awayGolExtra;
+                    gameStatus = "FT";
+                    
+                  } else if (homeGolPen != null){
                     homeGol = homeGolPen;
                     awayGol = awayGolPen;
+                    gameStatus = "FT";
                   }
                   Game.findByIdAndUpdate(id,{$set:{status: gameStatus, team1Gol: homeGol, team2Gol:awayGol}}, function (err, doc){
                     if (err) console.log(err);
                     else {
                       console.log("status:",doc.status);
                       let actualizar = false;
-                      if ((doc.status != "FT" && doc.status!="PEN")   && (gameStatus === "FT" || gameStatus === "PEN" )) actualizar = true
+                      //if ((doc.status != "FT" && doc.status!="PEN")   && (gameStatus === "FT" || gameStatus === "PEN" )) actualizar = true
+                      if (doc.status != "FT"  && gameStatus === "FT") actualizar = true
                       console.log("Fixture "+id+" actualizado...");
 
-                      if ((gameStatus === "FT" || gameStatus === "PEN")  && actualizar){
+                      //if ((gameStatus === "FT" || gameStatus === "PEN")  && actualizar){
+                      if (gameStatus === "FT" && actualizar){
                         if (homeGol > awayGol){
                       //home Team winner
                     //Equipo.findOneAndUpdate({nameEng:homeTeam},{$set:{puntos:puntos+3,lastUpdate:fechaUpdate}},(err,doc) => {
