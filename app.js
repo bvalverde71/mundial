@@ -139,27 +139,25 @@ app.get("/:groupName", function(req, res) {
     count+=1;
     Sistema.findById(1,function(err,sisValues){
       Fase.find({_id:groupName},{},function(err,fase){
-      const [{title}] = fase;
-      const [{content:groupTitle}]= fase;
-      //contenido.push(fase);
-      console.log(title);
-      //Apuesta.find({fase_id:"grupos"}).sort({puntos:-1}).exec(function(err, bets){
-      Apuesta.find({fase_id:groupName},null,{sort:{puntos:-1}},function(err, bets){
-        //console.log(bets);
-        //const bets=[];
-        // bets.forEach( function(j){
-        //   console.log(j.person_id);
-        // });
-      res.render("knockouts", {
-        fechaSis: sisValues.lastUpdate,
-        titulo: title,
-        tituloFila: groupTitle,
-        data: bets
+        if (err) console.log(err)
+        else {
+          const [{title}] = fase;
+          const [{content:groupTitle}]= fase;
+          //contenido.push(fase);
+          console.log(title);
+          //Apuesta.find({fase_id:"grupos"}).sort({puntos:-1}).exec(function(err, bets){
+          Apuesta.find({fase_id:groupName},null,{sort:{puntos:-1}},function(err, bets){
+            res.render("knockouts", {
+              fechaSis: sisValues.lastUpdate,
+              titulo: title,
+              tituloFila: groupTitle,
+              data: bets
+            });
+          });
+        }
       });
     });
-  });
-});
-}
+  }
 });
 
 //Cuando se necesita extraer los datos introducidos en un html form, esta funcion es la que procesa extrae los datos usando el body-parser package. en este ejemplo se extrae 3 parametros
