@@ -110,7 +110,6 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
                 datos.forEach(function(element){
                   const {fixture:{id}} = element;
                   let {fixture:{status:{short: gameStatus}}} = element;
-                  //const gameStatus = "FT";
                   const {teams:{home:{name: homeTeam}}} = element;
                   const {teams:{away:{name: awayTeam}}} = element;
                   let {goals:{home:homeGol}} = element;
@@ -120,14 +119,16 @@ exports.initialLoad = function(firstCall,fecha, Fase, Bet, Game, Equipo,Sistema,
                   const {score:{penalty:{home:homeGolPen}}} = element;
                   const {score:{penalty:{away:awayGolPen}}} = element;
 
-                  //const homeGol = 2;
-                  //const awayGol = 1;
+                  //Usar para test
+                  // let gameStatus = "FT";
+                  // let homeGol = 2;
+                  // let awayGol = 1;
                   console.log(id, gameStatus, homeGol,awayGol,homeGolExtra, awayGolExtra, homeGolPen,awayGolPen);
                   if (homeGolExtra != null && homeGolExtra != awayGolExtra) {
                     homeGol = homeGolExtra;
                     awayGol = awayGolExtra;
                     gameStatus = "FT";
-                    
+
                   } else if (homeGolPen != null){
                     homeGol = homeGolPen;
                     awayGol = awayGolPen;
@@ -182,7 +183,17 @@ function updEquipos(fecha, Team, equipo, goles, Fase,Bet,Sistema,round,golGanado
       if (err) console.log(err);
       else  console.log("Equipo actualizado:", doc.name);
     });
-    Bet.find({fase_id:round,"bet.betSelect":doc.name}, (err,recs) =>{
+
+    let filtro = {fase_id:round,"bet.betSelect":doc.name};
+    if (round === "final1") {
+      filtro = {fase_id:"final","bet.0.betSelect":doc.name};
+      }
+    else if (round === "final2") {
+      filtro = {fase_id:"final","bet.1.betSelect":doc.name};
+      }
+    console.log("Condition de final:",filtro);
+    //Bet.find({fase_id:ronda,finalSelector:doc.name}, (err,recs) =>{
+      Bet.find(filtro, (err,recs) =>{
       if (err) console.log(err);
       else {
         recs.forEach(elemento =>{
